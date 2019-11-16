@@ -17,13 +17,41 @@ def add(lst,item):
 class Lexicon:
     """stores known word stems of various part-of-speech categories"""
     # add code here
+    def __init__(self):
+        self.stemCatPairs= []
+
+    def add(self, stem, cat):
+        self.stemCatPairs.append((stem, cat))
+
+    def getAll(self, targetCategory):
+        return list(set([stem for stem, cat in self.stemCatPairs if cat == targetCategory]))
 
 class FactBase:
     """stores unary and binary relational facts"""
     # add code here
+    def __init__(self):
+        """
+        some consideration
+        lookup time: ?
+        allow duplicate: ?
+        """
+        self.unaryFacts = set()
+        self.binaryFacts = set()
+
+    def addUnary(self, pred, e1):
+        self.unaryFacts.add((pred, e1))
+
+    def queryUnary(self, pred, e1):
+        return (pred, e1) in self.unaryFacts
+
+    def addBinary(self, pred, e1, e2):
+        self.binaryFacts.add((pred, e1, e2))
+
+    def queryBinary(self, pred, e1, e2):
+        return (pred, e1, e2) in self.binaryFacts
 
 import re
-from nltk.corpus import brown 
+from nltk.corpus import brown
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
     # add code here
@@ -63,6 +91,5 @@ def process_statement (lx,wlist,fb):
                     lx.add (stem,'T')
                     fb.addBinary ('T_'+stem,wlist[0],wlist[2])
     return msg
-                        
-# End of PART A.
 
+# End of PART A.
