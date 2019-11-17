@@ -55,6 +55,36 @@ from nltk.corpus import brown
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
     # add code here
+    if re.match(r'.*[^sxyzaeiou]s$', s):
+        #Need to figure out how to include ch, sh
+        print("case1: ", s)
+        return s[:-1]
+    elif re.match(r'.*[aeiou]ys$', s):
+        print("case2: ", s)
+        return s[:-1]
+    elif re.match(r'.+[^aeiou]ies$', s):
+        print("case3: ", s)
+        return s[:-3] + "y"
+    elif re.match(r'[^aeiou]ies$', s):
+        print("case4: ", s)
+        return s[:-1]
+    elif re.match(r'.*(o|x|ch|sh|ss|zz)es$', s):
+        print("case5: ", s)
+        return s[:-2]
+    elif re.match(r'.*([^s]se|[^z]ze)s$', s):
+        print("case6: ", s)
+        return s[:-1]
+    elif s == 'has':
+        print("case7: ", s)
+        return 'have'
+    elif re.match(r'.*(?![iosxz]|ch|sh)es$', s):
+        #probably not the way to do this
+        #look into how to except not just a character but also string
+        print("case8: ", s)
+        return s[:-1]
+    else:
+        return s
+
 
 def add_proper_name (w,lx):
     """adds a name to a lexicon, checking if first letter is uppercase"""
