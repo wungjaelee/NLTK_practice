@@ -9,6 +9,7 @@
 
 
 # PART A: Processing statements
+from collections import defaultdict
 
 def add(lst,item):
     if (item not in lst):
@@ -18,13 +19,13 @@ class Lexicon:
     """stores known word stems of various part-of-speech categories"""
     # add code here
     def __init__(self):
-        self.stemCatPairs= []
+        self.pos_tag_to_stem= defaultdict(list)
 
-    def add(self, stem, cat):
-        self.stemCatPairs.append((stem, cat))
+    def add(self, stem, pos_tag):
+        self.pos_tag_to_stem[pos_tag].append(stem)
 
-    def getAll(self, targetCategory):
-        return list(set([stem for stem, cat in self.stemCatPairs if cat == targetCategory]))
+    def getAll(self, target_pos_tag):
+        return list(set(self.pos_tag_to_stem[target_pos_tag]))
 
 class FactBase:
     """stores unary and binary relational facts"""
@@ -52,9 +53,22 @@ class FactBase:
 
 import re
 from nltk.corpus import brown
-def verb_stem(s):
-    """extracts the stem from the 3sg form of a verb, or returns empty string"""
-    # add code here
+
+#preprocess Brown Tagged Words
+VB = set()
+VBZ = set()
+for word, tag in brown.tagged_words():
+    if tag == 'VB':
+        VB.add(word)
+    elif tag == 'VBZ':
+        VBZ.add(word)
+    else:
+        continue
+
+def is_verb(s, stem):
+    return s in VBZ or stem in VB
+
+def stem(s):
     if re.match(r'.*[^sxyzaeiou]s$', s):
         #Need to figure out how to include ch, sh
         print("case1: ", s)
@@ -83,7 +97,23 @@ def verb_stem(s):
         print("case8: ", s)
         return s[:-1]
     else:
-        return s
+        raise ValueError("Not in 3s form")
+
+
+def verb_stem(s):
+    """extracts the stem from the 3sg form of a verb, or returns empty string"""
+    # add code here
+
+    # convert s to stem
+    try:
+        hypothesized_stem = stem(s)
+    except ValueError:
+        # s is not in 3s form
+        return ""
+    if is_verb(s, stem):
+        return hypothesized_stem
+    else:
+        return ""
 
 
 def add_proper_name (w,lx):

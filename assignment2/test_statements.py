@@ -1,5 +1,8 @@
 import unittest
-from statements import Lexicon, FactBase, verb_stem
+from statements import Lexicon, FactBase, verb_stem, process_statement
+
+def parse(s):
+    return s.split(" ")
 
 class LexiconTestCase(unittest.TestCase):
     def test_lexicon_add(self):
@@ -101,6 +104,13 @@ class VerbStemTestCase(unittest.TestCase):
         self.assertEqual(verb_stem("hates"), "hate")
         self.assertEqual(verb_stem("bathes"), "bathe")
 
+class GeneralTestCase(unittest.TestCase):
+    def test_lexicon(self):
+        lx = Lexicon()
+        fb = FactBase()
+        s = "John is cute"
+        process_statement(lx, parse(s), fb)
+        self.assertEqual(lx.getAll('A'), ['cute'])
 
 
 if __name__ == '__main__':

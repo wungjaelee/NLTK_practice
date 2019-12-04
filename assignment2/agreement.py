@@ -91,28 +91,77 @@ def N_phrase_num(tr):
         return tr[0][1]  # the s or p from Ns or Np
     elif (tr.label() == 'Nom'):
         return N_phrase_num(tr[0])
-    elif  # add code here
+    # add code here
+    elif (tr.label() == 'AN'):
+        # AN -> N, or you can check by len(tr) == 1
+        if tr[0].label() == 'N':
+            return N_phrase_num(tr[0])
+        # AN -> A AN
+        # same thing as checking tr[0].label() == 'A'
+        else:
+            return N_phrase_num(tr[1])
+    elif (tr.label() == 'NP'):
+        # NP -> P
+        if tr[0].label == 'P':
+            return 's'
+        # NP -> AR Nom
+        elif tr[0].label == 'AR':
+            return N_phrase_num(tr[1])
+        # NP -> Nom
+        else:
+            return N_phrase_num(tr[0])
+    else:
+        "If given proper noun phrase, it would not reach here"
+        "NEED TO IMPLEMENT, DONT KNOW WHAT TO DO"
+        raise ValueError("Not a noun phrase! given: ", tr.label())
 
 def V_phrase_num(tr):
     """returns the number attribute of a verb-like tree, based on its head verb,
        or '' if this is undetermined."""
+    """THINK OF MORE UNDETERMINED CASES!"""
     if (tr.label() == 'T' or tr.label() == 'I'):
         return tr[0][1]  # the s or p from Is,Ts or Ip,Tp
     elif (tr.label() == 'VP'):
         return V_phrase_num(tr[0])
-    elif  # add code here
+    # add code here
+    elif (tr.label() == 'BE' or tr.label() == 'DO'):
+        return tr[0][2] # the s or p from BEs,BEp or DOs, DOp
+    elif (tr.label() == 'Rel'):
+        return V_phrase_num(tr[1])
+    elif (tr.label() == 'QP'):
+        if tr[0].label() == 'VP':
+            return V_phrase_num(tr[0])
+        # QP -> DO NP T
+        # Undetermined, since WHICH Nom can be Which ducks or Which duck
+        # Which ducks does John like, Which duck does John like
+        else:
+            return ""
+    else:
+        """Think of what to do for non proper V_phrase"""
+        raise ValueError("Not a verb phrase! given: ", tr.label())
 
 def matches(n1,n2):
     return (n1==n2 or n1=='' or n2=='')
 
 def check_node(tr):
     """checks agreement constraints at the root of tr"""
+    """UNFINISHED"""
     rule = top_level_rule(tr)
     if (rule == 'S -> WHICH Nom QP QM'):
         return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[2])))
     elif (rule == 'NP -> AR Nom'):
         return (N_phrase_num(tr[1]) == 's')
-    elif  # add code here
+    # add code here
+    elif (rule == 'QP -> DO NP T'):
+        return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[0])))
+    elif (rule == 'VP -> T NP'):
+        return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[0])))
+    elif (rule == 'VP -> BE NP'):
+        return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[0])))
+    elif (rule == 'NP'):
+        pass
+    else:
+        pass
 
 def check_all_nodes(tr):
     """checks agreement constraints everywhere in tr"""
